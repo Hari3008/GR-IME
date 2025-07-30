@@ -12,7 +12,6 @@ import util.HaarTransform;
 import util.Histogram;
 import util.PixelProcessor;
 
-
 /**
  * Class representing an RGB image, extending the abstract class Image.
  * This class provides the implementation for applying filters, splitting the image
@@ -72,7 +71,8 @@ public class RGBImage extends AbstractImage {
 
     for (int i = 0; i < height; i++) {
       for (int j = 0; j < width; j++) {
-        copyImage.pixels[i][j] = new RGBPixel(pixels[i][j].getPacked());
+        copyImage.pixels[i][j] = new RGBPixel(
+                pixels[i][j].getRed(), pixels[i][j].getGreen(), pixels[i][j].getBlue());
       }
     }
 
@@ -138,9 +138,9 @@ public class RGBImage extends AbstractImage {
     // initialize reds, greens, and blues
     for (int i = 0; i < h; i++) {
       for (int j = 0; j < w; j++) {
-        reds[i][j] = this.getRed(i, j);
-        greens[i][j] = this.getGreen(i, j);
-        blues[i][j] = this.getBlue(i, j);
+        reds[i][j] = this.getPixel(i, j).getRed();
+        greens[i][j] = this.getPixel(i, j).getGreen();
+        blues[i][j] = this.getPixel(i, j).getBlue();
       }
     }
 
@@ -158,6 +158,33 @@ public class RGBImage extends AbstractImage {
     }
 
     this.pixels = compressed;
+  }
+
+  private void applyTransform(Function<Pixel, Integer> transformFunction) {
+    int height = this.pixels.length;
+    int width = this.pixels[0].length;
+    int[][] result = new int[height][width];
+
+    for (int i = 0; i < height; i++) {
+      for (int j = 0; j < width; j++) {
+        result[i][j] = transformFunction.apply(this.pixels[i][j]);
+        RGBPixel pixel = new RGBPixel(result[i][j]);
+        this.pixels[i][j] = pixel;
+      }
+    }
+  }
+
+  private int findChannelPeak(int[] histogram) {
+    int peakValue = 0;
+    int peakPosition = 0;
+    for (int i = 10; i <= 245; i++) {
+      if (histogram[i] > peakValue) {
+        peakValue = histogram[i];
+        peakPosition = i;
+      }
+    }
+
+    return peakPosition;
   }
 
   @Override
@@ -184,33 +211,6 @@ public class RGBImage extends AbstractImage {
     this.applyTransform(colorCorrect);
   }
 
-  private int findChannelPeak(int[] histogram) {
-    int peakValue = 0;
-    int peakPosition = 0;
-    for (int i = 10; i <= 245; i++) {
-      if (histogram[i] > peakValue) {
-        peakValue = histogram[i];
-        peakPosition = i;
-      }
-    }
-
-    return peakPosition;
-  }
-
-  private void applyTransform(Function<Pixel, Integer> transformFunction) {
-    int height = this.pixels.length;
-    int width = this.pixels[0].length;
-    int[][] result = new int[height][width];
-
-    for (int i = 0; i < height; i++) {
-      for (int j = 0; j < width; j++) {
-        result[i][j] = transformFunction.apply(this.pixels[i][j]);
-        RGBPixel pixel = new RGBPixel(result[i][j]);
-        this.pixels[i][j] = pixel;
-      }
-    }
-  }
-
   private int fittingProcess(int black, int mid, int white, int signal) {
     double valueA = Math.pow(black, 2) * (mid - white) - black * (Math.pow(mid, 2)
             - Math.pow(white, 2)) + white * Math.pow(mid, 2) - mid * Math.pow(white, 2);
@@ -224,10 +224,9 @@ public class RGBImage extends AbstractImage {
             - black * (255 * Math.pow(mid, 2) - 128 * Math.pow(white, 2));
 
     double a = valueAa / valueA;
-
     double b = valueAb / valueA;
-
     double c = valueAc / valueA;
+
     return Math.max(0, Math.min(255, (int) (a * Math.pow(signal, 2) + b * signal + c)));
   }
 
@@ -244,4 +243,93 @@ public class RGBImage extends AbstractImage {
     this.applyTransform(levelAdjust);
   }
 
+  @Override
+  public void downscale(int newHeight, int newWidth) {
+    if (newHeight > this.getHeight() || newWidth > this.getWidth()
+            || newHeight <= 0 || newWidth <= 0) {
+      throw new IllegalArgumentException("Height and width must be greater than the original.");
+    }
+    int existingHeight = this.getHeight();
+    int existingWidth = this.getWidth();
+    Pixel[][] downsizedPixels = new RGBPixel[newHeight][newWidth];
+    for (int y = 0; y < newHeight; y++) {
+      for (int x = 0; x < newWidth; x++) {
+        float originalX = (float) x * existingWidth / newWidth;
+        float originalY = (float) y * existingHeight / newHeight;
+
+        int x1 = (int) Math.floor(originalX);
+        int y1 = (int) Math.floor(originalY);
+        int x2 = (int) Math.ceil(originalX);
+        int y2 = (int) Math.ceil(originalY);
+
+        x1 = Math.min(x1, existingWidth - 1);
+        x2 = Math.min(x2, existingWidth - 1);
+        y1 = Math.min(y1, existingHeight - 1);
+        y2 = Math.min(y2, existingHeight - 1);
+
+        RGBPixel cA = (RGBPixel) this.pixels[y1][x1];
+        RGBPixel cB = (RGBPixel) this.pixels[y1][x2];
+        RGBPixel cC = (RGBPixel) this.pixels[y2][x1];
+        RGBPixel cD = (RGBPixel) this.pixels[y2][x2];
+
+        float xWeight = originalX - x1;
+        float yWeight = originalY - y1;
+
+        int red = Math.round(
+                (1 - xWeight) * (1 - yWeight) * cA.getRed()
+                        + xWeight * (1 - yWeight) * cB.getRed()
+                        + (1 - xWeight) * yWeight * cC.getRed()
+                        + xWeight * yWeight * cD.getRed()
+        );
+
+        int green = Math.round(
+                (1 - xWeight) * (1 - yWeight) * cA.getGreen()
+                        + xWeight * (1 - yWeight) * cB.getGreen()
+                        + (1 - xWeight) * yWeight * cC.getGreen()
+                        + xWeight * yWeight * cD.getGreen()
+        );
+
+        int blue = Math.round(
+                (1 - xWeight) * (1 - yWeight) * cA.getBlue()
+                        + xWeight * (1 - yWeight) * cB.getBlue()
+                        + (1 - xWeight) * yWeight * cC.getBlue()
+                        + xWeight * yWeight * cD.getBlue()
+        );
+
+        downsizedPixels[y][x] = new RGBPixel(red, green, blue);
+      }
+    }
+    this.pixels = downsizedPixels;
+  }
+
+  private Pixel blendPixel(Pixel originalPixel, Pixel processedPixel, int maskValue) {
+    if (maskValue == 0) {
+      return processedPixel;
+    } else {
+      return originalPixel;
+    }
+  }
+
+  @Override
+  public ImageModel applyMasking(ImageModel maskImage, ImageModel operatedImage) {
+    if (!(this.getWidth() == maskImage.getWidth() && this.getHeight() == maskImage.getHeight())) {
+      throw new IllegalArgumentException(
+              "Original image and mask image must have the same dimensions.");
+    }
+
+    int width = this.getWidth();
+    int height = this.getHeight();
+
+    RGBImage resultMask = new RGBImage(height, width);
+
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        Pixel p = blendPixel(this.getPixel(y, x),
+                operatedImage.getPixel(y, x),
+                maskImage.getPixel(y, x).getRed());
+        resultMask.pixels[y][x] = p;
+      }
+    }
+    return resultMask;
+  }
 }

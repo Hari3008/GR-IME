@@ -1,10 +1,6 @@
 package controller.command;
 
-import java.util.Map;
-
-import controller.ImageCommand;
-import model.ImageModel;
-import util.ImageTransformer;
+import model.ImageMap;
 
 /**
  * A class that represents the Brighten transformation on an image.
@@ -33,8 +29,7 @@ public class Brighten implements ImageCommand {
   }
 
   @Override
-  public int apply(Map<String, ImageModel> images) {
-    return ImageTransformer.apply(images, source,
-            result, img -> img.brighten(val));
+  public int apply(ImageMap images) {
+    return images.apply(source, result, img -> img.brighten(val), 0);
   }
 }

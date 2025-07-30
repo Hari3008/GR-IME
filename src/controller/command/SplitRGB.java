@@ -1,8 +1,6 @@
 package controller.command;
 
-import java.util.Map;
-
-import controller.ImageCommand;
+import model.ImageMap;
 import model.ImageModel;
 
 /**
@@ -34,7 +32,7 @@ public class SplitRGB implements ImageCommand {
   }
 
   @Override
-  public int apply(Map<String, ImageModel> images) {
+  public int apply(ImageMap images) {
     if (images.get(source) == null) {
       System.out.println("Image " + source + " not found!");
       return 1;

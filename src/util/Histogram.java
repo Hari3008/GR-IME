@@ -16,7 +16,6 @@ import model.pixel.RGBPixel;
  */
 public class Histogram {
 
-
   private final BufferedImage histogram;
 
   /**
@@ -109,9 +108,9 @@ public class Histogram {
 
     for (int i = 0; i < rgbImage.getHeight(); i++) {
       for (int j = 0; j < rgbImage.getWidth(); j++) {
-        reds[rgbImage.getRed(i, j)]++;
-        greens[rgbImage.getGreen(i, j)]++;
-        blues[rgbImage.getBlue(i, j)]++;
+        reds[rgbImage.getPixel(i, j).getRed()]++;
+        greens[rgbImage.getPixel(i, j).getGreen()]++;
+        blues[rgbImage.getPixel(i, j).getBlue()]++;
       }
     }
 

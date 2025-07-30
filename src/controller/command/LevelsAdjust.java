@@ -1,10 +1,6 @@
 package controller.command;
 
-import java.util.Map;
-
-import controller.ImageCommand;
-import model.ImageModel;
-import util.ImageTransformer;
+import model.ImageMap;
 
 /**
  * A class that represents the Levels Adjust transformation on an image.
@@ -47,12 +43,11 @@ public class LevelsAdjust implements ImageCommand {
   }
 
   @Override
-  public int apply(Map<String, ImageModel> images) {
-    if (split == 0 || split == 100) {
-      return ImageTransformer.apply(images, source, result, img -> img.levelsAdjust(b, m, w));
-    } else {
-      return ImageTransformer.applySplit(images, source,
-              result, img -> img.levelsAdjust(b, m, w), split);
+  public int apply(ImageMap images) {
+    if (b > m || m > w) {
+      return 1;
     }
+
+    return images.apply(source, result, img -> img.levelsAdjust(b, m, w), split);
   }
 }

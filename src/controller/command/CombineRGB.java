@@ -1,8 +1,6 @@
 package controller.command;
 
-import java.util.Map;
-
-import controller.ImageCommand;
+import model.ImageMap;
 import model.ImageModel;
 
 /**
@@ -33,7 +31,7 @@ public class CombineRGB implements ImageCommand {
   }
 
   @Override
-  public int apply(Map<String, ImageModel> images) {
+  public int apply(ImageMap images) {
     if (images.get(red) == null) {
       System.out.println("Image " + red + " not found!");
       return 1;

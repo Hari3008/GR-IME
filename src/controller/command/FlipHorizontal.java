@@ -1,10 +1,6 @@
 package controller.command;
 
-import java.util.Map;
-
-import controller.ImageCommand;
-import model.ImageModel;
-import util.ImageTransformer;
+import model.ImageMap;
 
 /**
  * A class that represents the Horizontal Flip transformation on an image.
@@ -25,12 +21,12 @@ public class FlipHorizontal implements ImageCommand {
       src = args[1];
       dest = args[2];
     } else {
-      throw new IllegalArgumentException("Unknown number of arguments for horizontalflip!");
+      throw new IllegalArgumentException("Unknown number of arguments for horizontal-flip!");
     }
   }
 
   @Override
-  public int apply(Map<String, ImageModel> images) {
-    return ImageTransformer.apply(images, src, dest, img -> img.horizontalFlip());
+  public int apply(ImageMap images) {
+    return images.apply(src, dest, img -> img.horizontalFlip(), 0);
   }
 }

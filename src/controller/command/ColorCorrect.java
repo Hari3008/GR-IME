@@ -1,10 +1,6 @@
 package controller.command;
 
-import java.util.Map;
-
-import controller.ImageCommand;
-import model.ImageModel;
-import util.ImageTransformer;
+import model.ImageMap;
 
 /**
  * A class that represents the Color Correct transformation on an image.
@@ -39,13 +35,7 @@ public class ColorCorrect implements ImageCommand {
   }
 
   @Override
-  public int apply(Map<String, ImageModel> images) {
-    if (split == 0 || split == 100) {
-      return ImageTransformer.apply(images, source,
-              result, img -> img.colorCorrect());
-    } else {
-      return ImageTransformer.applySplit(images, source,
-              result, img -> img.colorCorrect(), split);
-    }
+  public int apply(ImageMap images) {
+    return images.apply(source, result, img -> img.colorCorrect(), split);
   }
 }

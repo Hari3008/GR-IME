@@ -1,7 +1,10 @@
 package model;
 
+import java.io.IOException;
+
 import controller.filter.Filter;
 import model.pixel.Pixel;
+import model.pixel.RGBPixel;
 
 /**
  * A mock implementation of the model used for testing the controller.
@@ -9,130 +12,181 @@ import model.pixel.Pixel;
  * It may also return a uniqueCode that it is initialized with, if return type is int.
  */
 public class MockImage implements ImageModel {
-  private StringBuilder log;
-  private int uniqueCode;
+  private final Appendable out;
 
-  public MockImage(StringBuilder log, int uniqueCode) {
-    this.log = log;
-    this.uniqueCode = uniqueCode;
+  /**
+   * Constructor function for the mock model. Takes in an appendable object to which it will add
+   * the log output for performing the operations.
+   *
+   * @param out the appendable log
+   */
+  public MockImage(Appendable out) {
+    this.out = out;
+  }
+
+  @Override
+  public int getHeight() {
+    return 0;
+  }
+
+  @Override
+  public int getWidth() {
+    return 0;
+  }
+
+  @Override
+  public Pixel getPixel(int i, int j) {
+    return new RGBPixel(0, 0, 0);
+  }
+
+  @Override
+  public ImageModel deepCopy() {
+    return this;
+  }
+
+  @Override
+  public void applyColorFilter(Filter filter) {
+    try {
+      out.append(String.format("In applyColorFilter with filter %s.\n",
+              filter.getClass().getName()));
+    } catch (IOException e) {
+      System.out.println("Unable to append to out!\n");
+    }
+  }
+
+  @Override
+  public void applyImageFilter(Filter filter) {
+    try {
+      out.append(String.format("In applyImageFilter with filter %s.\n",
+              filter.getClass().getName()));
+    } catch (IOException e) {
+      System.out.println("Unable to append to out!\n");
+    }
+  }
+
+  @Override
+  public void valueComponent() {
+    try {
+      out.append("In valueComponent.\n");
+    } catch (IOException e) {
+      System.out.println("Unable to append to out!\n");
+    }
+  }
+
+  @Override
+  public void brighten(int val) {
+    try {
+      out.append(String.format("In brighten with value %d.\n", val));
+    } catch (IOException e) {
+      System.out.println("Unable to append to out!\n");
+    }
+  }
+
+  @Override
+  public void horizontalFlip() {
+    try {
+      out.append("In horizontalFlip.\n");
+    } catch (IOException e) {
+      System.out.println("Unable to append to out!\n");
+    }
+  }
+
+  @Override
+  public void verticalFlip() {
+    try {
+      out.append("In verticalFlip.\n");
+    } catch (IOException e) {
+      System.out.println("Unable to append to out!\n");
+    }
+  }
+
+  @Override
+  public ImageModel[] splitComponents() {
+    try {
+      out.append("In splitComponents.\n");
+    } catch (IOException e) {
+      System.out.println("Unable to append to out!\n");
+    }
+    return new MockImage[]{this, this, this};
+  }
+
+  @Override
+  public void combineComponents(ImageModel img) {
+    try {
+      out.append("In combineComponents.\n");
+    } catch (IOException e) {
+      System.out.println("Unable to append to out!\n");
+    }
   }
 
   @Override
   public void compress(int ratio) {
-    log.append(String.format("Inside compress with ratio of: %d.\n", ratio));
+    try {
+      out.append(String.format("In compress with ratio %d.\n", ratio));
+    } catch (IOException e) {
+      System.out.println("Unable to append to out!\n");
+    }
   }
 
   @Override
   public void colorCorrect() {
-    log.append("Inside color correct.");
+    try {
+      out.append("In colorCorrect.\n");
+    } catch (IOException e) {
+      System.out.println("Unable to append to out!\n");
+    }
   }
 
   @Override
   public ImageModel histogram() {
+    try {
+      out.append("In histogram.\n");
+    } catch (IOException e) {
+      System.out.println("Unable to append to out!\n");
+    }
     return null;
   }
 
   @Override
   public void levelsAdjust(int black, int mid, int white) {
-    log.append(String.format("Inside levelsAdjust with black = %d, mid = %d, white = %d.\n",
-            black, mid, white));
+    try {
+      out.append(String.format("In levelsAdjust with black %d, mid %d, white %d.\n",
+              black, mid, white));
+    } catch (IOException e) {
+      System.out.println("Unable to append to out!\n");
+    }
   }
 
   @Override
   public ImageModel[] splitImage(int ratio) {
-    log.append(String.format("Inside splitImage with ratio of: %d.\n", ratio));
-    return null;
+    try {
+      out.append(String.format("In splitImage with ratio %d.\n", ratio));
+    } catch (IOException e) {
+      System.out.println("Unable to append to out!\n");
+    }
+    return new MockImage[]{this, this};
   }
 
   @Override
   public void mergeSplits(ImageModel img) {
-    log.append(String.format("Inside of mergeRight with img height = %d and width = %d.\n",
-            img.getHeight(), img.getWidth()));
+    try {
+      out.append("In mergeSplits.\n");
+    } catch (IOException e) {
+      System.out.println("Unable to append to out!\n");
+    }
   }
 
   @Override
-  public int getHeight() {
-    log.append("Inside getHeight. \n");
-    return uniqueCode;
+  public void downscale(int newHeight, int newWidth) {
+    try {
+      out.append(String.format("In downscale with height %d and width %d.\n", newHeight, newWidth));
+    } catch (IOException e) {
+      System.out.println("Unable to append to out!\n");
+    }
   }
 
   @Override
-  public int getWidth() {
-    log.append("Inside getWidth. \n");
-    return uniqueCode;
-  }
-
-  @Override
-  public int getRed(int i, int j) {
-    return 0;
-  }
-
-  @Override
-  public int getGreen(int i, int j) {
-    return 0;
-  }
-
-  @Override
-  public int getBlue(int i, int j) {
-    return 0;
-  }
-
-  @Override
-  public int getPackedPixel(int i, int j) {
-    log.append(String.format("Inside getPackedPixel with i = %d, j = %d. \n", i, j));
-    return uniqueCode;
-  }
-
-  @Override
-  public Pixel getPixel(int i, int j) {
+  public ImageModel applyMasking(ImageModel maskImage, ImageModel operatedImage) {
     return null;
-  }
-
-  @Override
-  public ImageModel deepCopy() {
-    log.append("Inside deepCopy. \n");
-    return null;
-  }
-
-  @Override
-  public void applyColorFilter(Filter filter) {
-    log.append("In applyColorFilter. \n");
-  }
-
-  @Override
-  public void applyImageFilter(Filter filter) {
-    log.append("In applyImageFilter. \n");
-  }
-
-  @Override
-  public void valueComponent() {
-    log.append("Inside valueComponent. \n");
-  }
-
-  @Override
-  public void brighten(int val) {
-    log.append(String.format("Inside brighten with val = %d. \n", val));
-  }
-
-  @Override
-  public void horizontalFlip() {
-    log.append("Inside horizontalFlip. \n");
-  }
-
-  @Override
-  public void verticalFlip() {
-    log.append("Inside verticalFlip. \n");
-  }
-
-  @Override
-  public ImageModel[] splitComponents() {
-    log.append("Inside splitComponents. \n");
-    return null;
-  }
-
-  @Override
-  public void combineComponents(ImageModel img) {
-    log.append(String.format("Inside combineComponents with img height = %d and width = %d. \n",
-            img.getHeight(), img.getWidth()));
   }
 }

@@ -1,10 +1,6 @@
 package controller.command;
 
-import java.util.Map;
-
-import controller.ImageCommand;
-import model.ImageModel;
-import util.ImageTransformer;
+import model.ImageMap;
 
 /**
  * A class that represents the Vertical Flip transformation on an image.
@@ -30,7 +26,7 @@ public class FlipVertical implements ImageCommand {
   }
 
   @Override
-  public int apply(Map<String, ImageModel> images) {
-    return ImageTransformer.apply(images, src, dest, img -> img.verticalFlip());
+  public int apply(ImageMap images) {
+    return images.apply(src, dest, img -> img.verticalFlip(), 0);
   }
 }

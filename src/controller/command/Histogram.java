@@ -1,8 +1,6 @@
 package controller.command;
 
-import java.util.Map;
-
-import controller.ImageCommand;
+import model.ImageMap;
 import model.ImageModel;
 
 /**
@@ -30,7 +28,7 @@ public class Histogram implements ImageCommand {
   }
 
   @Override
-  public int apply(Map<String, ImageModel> images) {
+  public int apply(ImageMap images) {
     ImageModel srcImage = images.get(source).deepCopy();
     ImageModel destImage = srcImage.histogram();
     images.put(result, destImage);

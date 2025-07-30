@@ -1,9 +1,6 @@
 package controller.command;
 
-import java.util.Map;
-
-import controller.ImageCommand;
-import model.ImageModel;
+import model.ImageMap;
 import util.ImageUtil;
 
 /**
@@ -30,7 +27,7 @@ public class Load implements ImageCommand {
   }
 
   @Override
-  public int apply(Map<String, ImageModel> images) {
+  public int apply(ImageMap images) {
     String extension = filePath.substring(filePath.lastIndexOf('.'));
 
     if (extension.equalsIgnoreCase(".jpg") || extension.equalsIgnoreCase(".png")) {
@@ -39,6 +36,7 @@ public class Load implements ImageCommand {
       images.put(imageName, ImageUtil.loadImageRaw(filePath));
     } else {
       System.out.printf("Error: Did not recognize file extension: %s!\n", extension);
+      return 1;
     }
 
     return 0;

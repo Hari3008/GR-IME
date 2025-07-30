@@ -1,10 +1,6 @@
 package controller.command;
 
-import java.util.Map;
-
-import controller.ImageCommand;
-import model.ImageModel;
-import util.ImageTransformer;
+import model.ImageMap;
 
 /**
  * A class that represents the Compress transformation on an image.
@@ -33,7 +29,7 @@ public class Compress implements ImageCommand {
   }
 
   @Override
-  public int apply(Map<String, ImageModel> images) {
-    return ImageTransformer.apply(images, source, result, img -> img.compress(ratio));
+  public int apply(ImageMap images) {
+    return images.apply(source, result, img -> img.compress(ratio), 0);
   }
 }
