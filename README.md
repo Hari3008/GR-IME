@@ -1,6 +1,6 @@
 # GRIME: Graphical Image Manipulation and Enhancement
 
-This assignment implements a graphical image processing application with support for image manipulation, filtering, and pixel operations. The system supports operations such as flipping, brightening, and applying various image filters (blur & sharpen) on an image represented as a grid of pixels. Our design is modular, allowing for easy extension and modification of image processing techniques.
+This project implements a graphical image processing application with support for image manipulation, filtering, and pixel operations. The system supports operations such as flipping, brightening, and applying various image filters (blur & sharpen) on an image represented as a grid of pixels. Our design is modular, allowing for easy extension and modification of image processing techniques.
 
 ![GRIME_GUI](./res/GRIME-GUI.jpg)
 
@@ -48,6 +48,3 @@ java ProgramRunner -file <script-file-path>
 ```
 
 To know about how to use our application, follow the [USEME.MD](USEME.md)
-
-## Image Citation
-**We own all the images used in this assignment.**
